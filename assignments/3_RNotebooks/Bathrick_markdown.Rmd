@@ -1,0 +1,27 @@
+---
+title: "R Markdown Documents - Part 1"
+author: "Rosalyn Bathrick"
+subtitle: “Analysis of Environmental Data”
+output:
+  html_document:
+    toc: yes
+    df_print: paged
+  html_notebook:
+    toc: yes
+    toc_float: yes
+    theme: darkly
+---
+# Introduction
+**Rozy Bathrick**, she/her\ *PhD student, Organismic and Evolutionary Biology*
+
+# Concepts List
+1. Comfort in R
+2. Spatial data analysis
+3. Linear regressions
+
+# Course List
+- Natural History Field Quarter
+- Ornithology
+- California History
+
+

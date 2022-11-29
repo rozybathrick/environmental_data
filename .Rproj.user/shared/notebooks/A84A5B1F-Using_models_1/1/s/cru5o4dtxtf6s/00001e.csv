@@ -1,0 +1,11 @@
+"0","dat_adchin=subset(penguin_dat, select=c(""Adelie"", ""Chinstrap""))
+"
+"1","[1m[33mError[39m in [38;5;232m`vectbl_as_col_location()`[39m:[22m
+[33m![39m Can't subset columns past the end.
+[31mx[39m Columns `Adelie` and `Chinstrap` don't exist.
+Backtrace:
+[90m 1. [39m[1mbase[22m::subset(penguin_dat, select = c(""Adelie"", ""Chinstrap""))
+[90m 2. [39mbase::subset.data.frame(penguin_dat, select = c(""Adelie"", ""Chinstrap""))
+[90m 4. [39m[1mtibble[22m:::`[.tbl_df`(x, r, vars, drop = drop)
+[90m 5. [39mtibble:::vectbl_as_col_location(...)
+"

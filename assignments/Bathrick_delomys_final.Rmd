@@ -1,0 +1,29 @@
+---
+title: "A of E D final project"
+author: "Rozy Bathrick"
+date: "2022-11-21"
+output: html_document
+---
+# Delomys data analysis{.tabset .tabset-pills}
+
+## Data Exploration and Q1-4
+
+First we look at the body length and mass of these little mice in summary and run
+a shapiro test to see if the variance is normally distributed
+
+
+```{r}
+delomys<-read.csv("data/delomys.csv")
+summary(delomys$body_mass)
+summary(delomys$body_length)
+shapiro.test(delomys$body_mass)
+shapiro.test(delomys$body_length)
+```
+
+Scatterplot of body length and body width
+```{r fig.width=10}
+
+plot(body_length ~ body_mass, data=delomys)
+
+```
+

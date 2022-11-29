@@ -1,0 +1,88 @@
+---
+title: "The ultimate guide to battling alongside R"
+author: "Rozy Bathrick"
+date: "2022-11-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# R Reference Guide {.tabset .tabset-pills}
+
+
+## Loading Data and Packages
+
+First couple of things we'll cover: how do you get some data into R, 
+and download the right packages to do what you want with it. 
+
+Loading a pre-existing package: use here and library
+```{r}
+library(here) #this tells R we are working in the current file pathway
+library(palmerpenguins) #this loads the practice dataset of Palmer Penguins (it's already been installed)
+require(here) #the require function tells R we want to use it - similar to library
+require(palmerpenguins)
+```
+
+Next we'll make a data frame out of the ginkgo data we collected as a class
+
+```{r}
+require(here)
+here()
+ginkgo<-read.csv(here("data", "ginkgo_data_2022.csv"))
+
+##here is on the wrong level - its inside repo
+```
+
+## Data Structures
+
+The function c() combines its arguments into a vector (a 1-dimensional data structure consisting of 1 or more elements).
+
+All of the elements must be of the same type.
+I can’t combine character and numeric types in the same call to c()
+Here’s two examples using numeric and character data types:
+
+```{r}
+## Create a vector of numbers:
+num_vec  = c(1, 4, 8, 9, 13)
+## Create a vector of characters:
+char_vec = c("there", "is", "a snake" , "in my boot")
+char_vec2=c("to", "infinitey", "and", "beyond")
+```
+
+I can show the contents of a vector by typing the name of the vector, or using the print() function.
+
+```{r}
+## Typing the name of the vector into the console prints the contents
+num_vec
+## The print() function accomplishes the same task:
+print(char_vec)
+```
+
+The function length() identifies how many elements are in a vector
+```{r}
+length(num_vec)
+```
+
+The function matrix() creates a grid of vectors that are the same length in elements.
+It can also split a single vector into a grid with the dimensions you specify with nrow or byrow
+You can also give the rows and columns names with dimnames
+```{r}
+m1<-matrix(data=char_vec,  nrow=2)
+print(m1)
+```
+
+The function dataframe()
+
+
+## Subsetting
+
+
+## Numerical Data Exploration
+
+
+## Graphical Data Exploration
+
+
+## Distribution Functions

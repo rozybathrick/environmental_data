@@ -1,0 +1,115 @@
+---
+title: "Using Models 1"
+author: "Rozy Bathrick"
+output:
+  html_document:
+    df_print: paged
+---
+
+### Q1 Create a histogram of the salamander reproduction catastrophic rates
+
+```{r}
+require(here)
+catrate<-read.csv(here("data", "catrate.csv"))
+head(catrate)
+summary(catrate)
+hist(catrate$cat.rate, xlab="Catastrophe Rate", main="Histogram of Catastrophe Rates")
+```
+
+### Q2 Conduct a Shapiro-Wilk test of normality of the salamander catastrophic rates. Report the p-value and show the R-code you used to conduct the test.
+```{r}
+shapiro.test(catrate$cat.rate)
+```
+
+### Q3 (1 pt.): What is the null hypothesis for the Shapiro test?
+
+A: The null hypothesis is the data was sampled from a normally-distributed population
+
+### Q4 (1 pt.): Based on the Shapiro test results, is there strong evidence that the sample came from a non-normally-distributed population?
+
+A: The p-value is smaller than 0.05, thus we have evidence that we can reject the null - the sample came from a non-normally distributed population
+
+### Q5 (1 pt.): Show the code you used to conduct the t-test.
+```{r}
+t.test(catrate$cat.rate, mu=2/7)
+```
+### Q6 (1 pt.): State the null hypothesis of the test, in plain nontechnical English.
+
+A: The null hypothesis is that the observed catastrophic rate is not different from the observed late-filling rate
+
+### Q7 (1 pt.): Is this a one- or two-tailed test?
+
+A: It is a two-tailed test
+
+### Q8 (2 pts.): What is the p-value from your t-test? Interpret the p-value as a false-positive rate using nontechnical English that a non-scientist would understand.
+
+A: The p-value is 0.01193, which means that we can reject the null that there is no difference between the two means. But - that doesn't mean the difference is solely about the late-filling pond rate, because the cat.rate includes other types of catastrophes.
+
+### Q9 (1 pt.): What is the confidence interval for the difference between the null hypothesis and alternative hypothesis means? Did it include zero?
+
+A: The confidence interval is 0.3526250 to 0.7261295, which does not include a 0. This means 95% of the time, difference between the means would fall between those two values and you'd find a difference between them.
+
+### Q10 (2 pts.): Considering the results from your t-test, did you conclude that there was strong evidence to reject the null hypothesis?
+
+A: Given the results of the t-test, I conclude there is not strong evidence to reject the null. The p-value is below 0.05, and the CI does not include 0.
+
+### Q11 (1 pt.): Show the code you used to conduct the test.
+```{r}
+wilcox.test(catrate$cat.rate, mu = 2 / 7)
+```
+
+### Q12 (1 pt.): Compare the p-value with the p-value you got from the t-test.
+The t.test p-value is 0.01193, the Wilcoxon p-value is smaller at 0.006275
+
+### Q13 (2 pts.): Considering the results from your rank sum test, did you conclude that there was strong evidence to reject the null hypothesis?
+
+Yes, there is strong evidence.
+
+### Q16 (2 pts.): Show the R-code you used to conduct tests of normality for the flipper lengths of Chinstrap and Adelie penguins.
+```{r}
+require(palmerpenguins)
+penguin_dat = droplevels(subset(penguins, species != "Gentoo"))
+summary(penguin_dat)
+boxplot(
+  flipper_length_mm ~ species, 
+  data = penguin_dat,
+  ylab = "Flipper Length (mm)")
+
+dat_adelie = subset(penguin_dat, species == "Adelie")
+dat_gentoo=subset(penguin_dat, species == "Gentoo")
+dat_chin=subset(penguin_dat, species == "Chinstrap")
+dat_adchin=subset(penguin_dat, species=c("Adelie", "Chinstrap"))
+shapiro.test(dat_adelie$flipper_length_mm)
+shapiro.test(dat_chin$flipper_length_mm)
+
+```
+### Q17 (2 pts.): Interpret the test results. Do you conclude that the flipper lengths are normally-distributed for each species? Make sure your answers make reference to the test output.
+
+A: Adelie flipper lengths do appear to be normally distributed (p=0.72), we accept the null. 
+Chinstrap flipper lengths also appear to be normally distributed (p=0.8106), accept the null
+
+### Q18 (2 pts.): Save your figure to a file and include it in your report. Your figure needs to have appropriate dimensions such that the two histograms are not vertically stretched.
+Hint: Check out the width and height arguments.
+Hint: Remember the par() function? Which argument did we use to include multiple plots in the same figure?
+
+```{r}
+par(mfrow=c(1,2))
+hist(dat_adelie$flipper_length_mm, xlab="Flipper Length", main="ADPE Flipper Length Histogram")
+hist(dat_chin$flipper_length_mm, xlab="Flipper Length", main="CHPE Flipper Length Histogram")
+
+```
+
+
+### Q19 (2 pts.): State the alternative hypothesis of the test, in plain nontechnical English.Consider whether you used a one- or two- tailed test.
+
+A: The alternative hypothesis is that Adelie Penguin have different flipper length than Chinstrap (they are
+either bigger or smaller) - it is a 2-tailed test
+
+
+### Q20 (1 pt.): Include the code you used to conduct the t-test.Hint: your answer should only be a single line of code.
+
+```{r}
+t.test(flipper_length_mm~species, data=dat_adchin)
+```
+
+
