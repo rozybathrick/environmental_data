@@ -1,0 +1,110 @@
+---
+title: "Using Models 2"
+author: "Rozy Bathrick"
+date: "2022-11-30"
+output: html_document
+---
+
+### Recap of T-test
+
+```{r}
+library(palmerpenguins)
+##one tailed T-tests
+
+t.test(subset(penguins, species == "Gentoo")$flipper_length_mm)#null is that the mean of Gentoo flipper lengths is not equal to zero 
+
+t.test(
+  x = subset(penguins, species == "Gentoo")$flipper_length_mm,
+  mu = 218) #null is that the mean of Gentoo flippers is not equal to 218
+
+t.test(
+  x = subset(penguins, species == "Gentoo")$flipper_length_mm,
+  mu = 218,
+  alternative = "less"
+) #null is that true mean of Gentoo flppers is less than 218mm. 
+```
+```{r}
+##Two-tailed T-tests
+
+t.test(flipper_length_mm ~ species, data = subset(penguins, species != "Chinstrap"))
+
+#t.test(flipper_length_mm ~ species, data = subset(penguins, species != "Chinstrap"), mu=mean(subset(penguins, flipper_length_mm, species="Gentoo")), alternative="less")
+```
+### ANOVA
+
+```{r}
+##first, graphical exploration
+
+par(mfrow = c(1, 2))
+hist(penguins$body_mass_g, breaks = 80, main = "histogram of body mass", xlab = "body mass (g)")
+plot(density(penguins$body_mass_g, na.rm = TRUE), main = "density plot of body mass")
+
+## the data is unimodal, and the peak lies between 3500-4000g
+
+boxplot(body_mass_g ~ species, data = penguins)
+##ADPE and CHPE have very similar masses, GEPE are quite a bit heavier
+```
+
+```{r}
+##next, numerical exploration
+dat_chinstrap = subset(penguins, species == "Chinstrap")
+mean(dat_chinstrap$body_mass_g, na.rm = TRUE)
+shapiro.test(dat_chinstrap$body_mass_g)#this tells us not to reject the null, so the data are normally distributed
+aggregate(body_mass_g ~ species, data = penguins, FUN = mean)
+aggregate(
+  body_mass_g ~ species,
+  data = penguins,
+  FUN = function(x) shapiro.test(x)$p.value)
+fit_species = lm(body_mass_g ~ species, data = penguins)#linear model: how much variation in body mass is explained by sp.
+summary(fit_species)
+anova(fit_species)
+```
+
+```{r}
+##2-way anovass
+fit_additive = lm(body_mass_g ~ sex + species, data = penguins)
+fit_interactive = lm(body_mass_g ~ sex * species, data = penguins)
+summary(fit_interactive)
+```
+
+## Q1 (4 pts.): Re-create the conditional boxplot of penguin body mass conditioned on sex and species. Include your boxplot as a figure in your report.
+
+```{r}
+boxplot(body_mass_g ~ sex+species, data = penguins, main= "Body Mass of three penguin species by sex", ylab="Body Mass (g)", las=2, xlab=" ", names=c("female \n Adelie", "male \n Adelie", "female \n Chinstrap", "male \n Chinstrap", "female \n Gentoo", "male \n Gentoo"))
+```
+
+## Q2 (2 pts.): Based on the boxplots, do you think male penguins are significantly heavier than female penguins of the same species? Explain your reasoning, and be sure to explain why you think any observed differences are significant or not.
+
+A: The boxplot that shows weight by sex alone (not species), indicates males are heavier than females. However, with the more detailed boxplot that breaks down both sex and species, the pattern is less clear - for Adelies and Chinstraps thy are almost equal with lots of overlap, Gentoos seem to possibly the only significant difference.
+
+## Q3 (2 pts.): Do you think adding sex to a model that already includes species will improve the model fit?
+
+Yes, I think it will help explain the subtle differences, especially within Gentoo. 
+
+## Q4 (2 pts.): Show the R-code you used to build fit_both
+
+```{r}
+fit_both=lm(body_mass_g ~ sex * species, data = penguins)
+summary(fit_both)
+```
+## Q5 : What is the base case for the two-way model that includes sex and species?
+
+A: female Adelie
+
+## Q6 (2 pts.): What are the names of the two coefficients (from the first column of the coefficient table) that you need to calculate the average mass of female Chinstrap penguins?
+
+A: (Intercept) - which is the base case of female Adelie and speciesChinstrap - which is the female Chinstrap
+
+## Q7 (2 pts.): What is the predicted average mass of female Chinstrap penguins in the interactive model?
+
+```{r}
+3368.84+158.37
+```
+
+## Q8 (2 pts.): What is the observed average mass of female Chinstrap penguins, calculated from the penguins data?
+
+```{r}
+fem_CHPE=subset(dat_chinstrap, sex=="female")
+mean(fem_CHPE$body_mass_g)
+```
+

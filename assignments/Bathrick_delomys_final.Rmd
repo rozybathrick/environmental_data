@@ -1,0 +1,190 @@
+---
+title: "A of E D final project"
+author: "Rozy Bathrick"
+date: "2022-11-21"
+output: html_document
+---
+# Delomys data analysis{.tabset .tabset-pills}
+
+## Data Exploration and Q1-4
+
+First we look at the body length and mass of these little mice in summary and run
+a shapiro test to see if the variance is normally distributed
+
+
+```{r}
+require(here)
+here()
+delo<-read.csv(here("data", "delomys.csv"))
+summary(delo$body_mass)
+summary(delo$body_length)
+shapiro.test(delo$body_mass)
+shapiro.test(delo$body_length)
+```
+
+### Graphical Exploration
+
+Scatterplot of body length and body width
+```{r fig.width=15}
+
+plot(body_length ~ body_mass, data=delo)
+
+```
+Histogram of body Mass
+```{r}
+hist(delo$body_mass, main="Histogram of Delomys body mass", xlab="Body Mass (g)")
+```
+
+Histogram of body length
+```{r}
+hist(delo$body_length, main="Histogram of Delomys body length", xlab="Body Length (mm)")
+```
+A conditional boxplot of body mass, conditioned on species (column binomial)
+
+```{r}
+boxplot(delo$body_mass ~ delo$binomial, main="Body mass of two Delomys Species", xlab=" ", ylab="Body Mass (g)")
+```
+A conditional boxplot of body mass, conditioned on sex (column binomial)
+```{r}
+boxplot(delo$body_mass ~ delo$sex, main="Body mass of Delomys Species by sex", xlab=" ", ylab="Body Mass (g)")
+```
+
+
+
+A conditional boxplot of body mass, conditioned on both species and sex
+```{r fig.aspect=20}
+boxplot(delo$body_mass ~ delo$sex+ delo$binomial, main="Body mass of two Delomys Species by sex", ylab="Body Mass (g)", xlab=" ", las=2, names=(c("D. dorsalis\n female", "D. dorsalis\nmale", "D. sublineatus\nfemale", "D. sublineatus\nmale")))
+
+```
+
+#### Q1 (2 pts.): Qualitatively describe the relationship between body mass and length.
+
+A: There does seem to be a relationship - it looks logarithmic to me, with diminishing returns in body length as the body mass increases.
+
+#### Q2 (2 pts.): Qualitatively describe the shapes of the histograms.
+
+A: The histograms are unimodal, and appear to be mostly normally distributed with mild skew.
+
+#### Q3 (3 pts.): Using both the histograms and normality tests, do you think the (unconditioned) body masses and body length are normally-distributed?
+
+A: Though the histograms look only slightly asymmetric, the shapiro test returns a low p-value, thus we reject the null that they are normally distributed (they are not normally-distributed) 
+
+#### Q4 (2 pts.): Examine the conditional boxplots. Describe any graphical evidence you see for body mass differences based on species and/or sex.
+
+A: There is not any strong evidence that sex or species are responsible for differences in body mass - the boxplots are mostly overlapping.
+
+## Model Building and Diagnostic Q5-6
+
+```{r}
+#Model 1: simple linear regression body_length ~ body_mass
+fit1=lm(body_length~body_mass, data=delo)
+
+#Model 2: 1-way ANOVA body_mass ~ sex
+fit2=lm(body_mass~sex, data=delo)
+           
+#Model 3: 1-way ANOVA body_mass ~ binomial
+fit3=lm(body_mass~binomial, data=delo)
+
+#Model 4: 2-way additive ANOVA body_mass ~ sex + binomial
+fit4=lm(body_mass~sex+binomial, data=delo)
+
+#Model 5: 2-way factorial ANOVA body_mass ~ sex * binomial
+fit5=lm(body_mass~sex*binomial, data=delo)
+```
+```{r}
+hist(residuals(fit1))
+shapiro.test(residuals(fit1)) #not normally distrib
+hist(residuals(fit2))
+shapiro.test(residuals(fit2)) #not normally distrib
+hist(residuals(fit3))
+shapiro.test(residuals(fit3)) #not normally distrib
+hist(residuals(fit4))
+shapiro.test(residuals(fit4)) #not normally distrib
+hist(residuals(fit5))
+shapiro.test(residuals(fit5)) #not normally distrib
+```
+
+#### Q5 (2 pts.): What do you conclude about residual normality based on the numerical and graphical diagnostics?
+
+A: The residuals are not normally distributed
+
+#### Q6 (1 pt.): Are violations of the normality assumption equally severe for all the models?
+
+A: No. Model 2: 1-way ANOVA explaining body mass by sex is the least severe in its violations, and the first Model is the most severe.
+
+
+## Model Interpretation Q7-16
+
+```{r}
+summary(fit1)
+```
+
+#### Q7 (2 pts.): What is the magnitude of the mass/length relationship?
+
+A: For every one mm increase in body length, body mass will increase by 0.875 g
+
+#### Q8 (2 pts.): What is the expected body length of an an animal that weighs 100g?
+
+```{r}
+76.12466+(100*.87550)
+```
+
+
+#### Q9 (2 pts.): What is the expected body length of an animal that weighs 0g?
+A: 76.12466 mm
+
+```{r}
+anova(fit2)
+anova(fit3)
+anova(fit4)
+anova(fit5)
+```
+
+#### Q10 (1 pt.): What is the base level for sex?
+
+A: female
+
+#### Q11 (1 pt.): What is the base level for binomial?
+
+A: D. dorsalis
+
+#### Q12 (1 pt.): Which sex is heavier?
+
+A: male
+
+#### Q13 (1 pt.): Which species is heavier?
+
+A: D. dorsalis
+
+#### Q14 (1 pt.): Are sex and species significant predictors for body mass?
+
+A: Yes
+
+#### Q15 (1 pt.): Is there a significant interaction?
+
+A: No
+
+#### Q16 (2 pts.): How dos the significance (as measured by p-value) of either of the main effects (sex and species) differ between the single-predictor models, the additive model, and the interactive model?
+
+A: The significance of the species effect remains constant in all models, at < 2.2e-16 *** (one of the lowest numbers possible). The significance of the sex effect varies a bit, but the p-value remains very small - though never close to as small as the species effect.
+
+## Model Comparison: Body Mass Q17-18
+
+
+```{r}
+##testing the goodness of fit with AIC value
+
+AIC(fit2) #Model 2: 1-way ANOVA body_mass ~ sex
+AIC(fit3) #Model 3: 1-way ANOVA body_mass ~ binomial
+AIC(fit4) #Model 4: 2-way additive ANOVA body_mass ~ sex + binomial
+AIC(fit5) #Model 5: 2-way factorial ANOVA body_mass ~ sex * binomial
+
+```
+
+#### Q17 (1 pt.): Which two models have the lowest AIC?
+A: Model 4: 2-way additive ANOVA body_mass ~ sex + binomial and
+Model 5: 2-way factorial ANOVA body_mass ~ sex * binomial
+
+#### Q18 (4 pts.): Which of the two models with lowest AIC scores would you select?
+
+Because there isn't a huge difference in AIC between the last two, and we know that the difference between species is really the responsible effect, I would choose Model 4. This is a less complex model, and allows us to see the difference between sex and species effect on body mass.
